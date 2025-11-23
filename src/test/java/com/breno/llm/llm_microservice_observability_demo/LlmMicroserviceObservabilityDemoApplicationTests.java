@@ -1,4 +1,4 @@
-package com.breno.llm.llm_microservice_observability_demo;
+package com.breno.llm.llmmicroserviceobservabilitydemo;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
