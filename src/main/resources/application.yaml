@@ -1,0 +1,3 @@
+spring:
+  application:
+    name: llm-microservice-observability-demo
