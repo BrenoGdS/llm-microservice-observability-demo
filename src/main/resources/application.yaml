@@ -9,9 +9,16 @@ langchain4j:
   ollama:
     chat-model:
       base-url: http://localhost:11434
-      model-name: llama3.2
-      temperature: 0.2
+      model-name: llama3
+      temperature: 1
 
 logging:
   level:
     root: DEBUG
+
+langfuse:
+  enabled: false # toggle to true when Langfuse is available
+  base-url: http://localhost:3000 # point to your manually managed Langfuse instance
+  public-key: ${LANGFUSE_PUBLIC_KEY:} # values supplied at runtime via env vars
+  secret-key: ${LANGFUSE_SECRET_KEY:} # values supplied at runtime via env vars
+  environment: local # tag used on traces (local/dev/prod)
