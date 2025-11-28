@@ -1,0 +1,33 @@
+receivers:
+  otlp:
+    protocols:
+      grpc:
+        endpoint: 0.0.0.0:4317
+      http:
+        endpoint: 0.0.0.0:4318
+processors:
+  batch:
+    send_batch_size: 50
+    timeout: 30s
+exporters:
+  otlp/langfuse:
+    endpoint: "http://langfuse-web:3000" # Endpoint OTLP (Recomendado)
+
+    # Configuração da Fila (Correta)
+    sending_queue:
+      enabled: true
+
+    # Configurações de Rede OTLP/HTTP (Corretas e no nível superior)
+    tls: # <-- A chave de configuração de TLS/inseguro deve vir aqui
+      insecure: true # ✅ Posição correta para desabilitar TLS
+
+    headers: # <-- Headers vão diretamente aqui
+      X-Langfuse-Public-Key: "pk-lf-a53b93e2-049d-48df-b993-6452807df915"
+      X-Langfuse-Secret-Key: "sk-lf-5adafa4e-b966-49c2-a1bc-1e5b4499f483"
+
+service:
+  pipelines:
+    traces:
+      receivers: [otlp]
+      processors: [batch]
+      exporters: [otlp/langfuse]

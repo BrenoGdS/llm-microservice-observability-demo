@@ -140,7 +140,15 @@ services:
       interval: 3s
       timeout: 10s
       retries: 10
-
+  otel-collector:
+    image: otel/opentelemetry-collector:nightly
+    container_name: otel-collector
+    command: [ "--config=/etc/otelcol/config.yaml" ]
+    volumes:
+      - ./otel-collector-config.yaml:/etc/otelcol/config.yaml
+    ports:
+      - "4317:4317" # Porta gRPC
+      - "4318:4318" # Porta HTTP (para o seu Spring Boot)
   postgres:
     image: docker.io/postgres:${POSTGRES_VERSION:-17}
     restart: always
