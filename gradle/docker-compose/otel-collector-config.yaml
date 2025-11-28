@@ -10,19 +10,21 @@ processors:
     send_batch_size: 50
     timeout: 30s
 exporters:
-  otlp/langfuse:
-    endpoint: ${LANGFUSE_OTLP_ENDPOINT}
-    sending_queue:
-      enabled: true
+  otlphttp/langfuse:
+    endpoint: ${LANGFUSE_BASE_URL}
+    traces_endpoint: ${LANGFUSE_TRACES_URL}
+    compression: gzip
+    timeout: 30s
+    headers:
+      Authorization: "Basic ${LANGFUSE_BASIC_AUTH}"
     tls:
       insecure: true
-    headers:
-      X-Langfuse-Public-Key: ${LANGFUSE_PUBLIC_KEY}
-      X-Langfuse-Secret-Key: ${LANGFUSE_SECRET_KEY}
+    sending_queue:
+      enabled: true
 
 service:
   pipelines:
     traces:
       receivers: [otlp]
       processors: [batch]
-      exporters: [otlp/langfuse]
+      exporters: [otlphttp/langfuse]

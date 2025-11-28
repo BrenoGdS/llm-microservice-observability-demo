@@ -38,10 +38,28 @@ curl -X POST http://localhost:8080/api/chat \
    ```
 4. Exercise `/api/chat`, then inspect traces/generations inside the Langfuse UI to review prompts, completions, latency, and token usage emitted by `LangfuseChatModelListener`.
 5. Leave `langfuse.enabled=false` whenever Langfuse isn’t reachable to skip the extra HTTP calls.
+6. (Collector path) Populate the project-root `.env` (shared by Spring + Docker Compose) with the Langfuse keys and OTLP settings, e.g.:
+   ```dotenv
+   LANGFUSE_PUBLIC_KEY=pk-lf-xxxxxxxx
+   LANGFUSE_SECRET_KEY=sk-lf-xxxxxxxx
+   LANGFUSE_BASE_URL=http://langfuse-web:3000
+   LANGFUSE_TRACES_URL=http://langfuse-web:3000/api/public/otel/v1/traces
+   LANGFUSE_BASIC_AUTH=cGstbGYtLi4uOnNrLS4uLg==  # base64 of "public:secret"
+   ```
+   You can generate `LANGFUSE_BASIC_AUTH` with `echo -n "pk-lf-…:sk-lf-…" | base64`.
+   then run (from the repo root so Compose picks up `.env`, or pass it explicitly as below):
+   ```bash
+   docker-compose --env-file .env \
+     -f gradle/docker-compose/docker-compose.yml \
+     up -d langfuse-web langfuse-worker clickhouse postgres redis minio otel-collector
+   ```
+   The collector now sends OTLP payloads directly to Langfuse’s `/api/public/otel/v1/traces` endpoint, so no additional path mangling is necessary.
 
 ## Testing Steps
 
-6.2 Testing: With the OpenTelemetry collector running from Step 6.1, run Boot with the OTLP endpoint set, then check logs or Langfuse UI for traces.
+1. **Step 6.1** – Run the command above to boot Langfuse + OTEL collector, then confirm `docker-compose ... ps` shows them healthy.
+2. **Step 6.2** – Start Spring Boot (defaults point to `http://localhost:4318/v1/traces`), hit `/api/chat`, and watch `docker-compose ... logs --tail=50 otel-collector` for incoming spans.
+3. **Step 6.3** – Verify the collector forwards events to Langfuse by checking for HTTP 200 responses in the collector log and confirming the new traces/ generations appear in the Langfuse UI.
 
 ## Roadmap (next up)
 1. Langfuse-based observability (ChatModelListener + OpenTelemetry).

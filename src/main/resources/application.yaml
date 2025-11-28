@@ -27,7 +27,7 @@ management:
       compression: gzip
 
 langfuse:
-  enabled: false # toggle to true when Langfuse is available
+  enabled: true # toggle to true when Langfuse is available
   base-url: http://localhost:3000 # point to your manually managed Langfuse instance
   public-key: ${LANGFUSE_PUBLIC_KEY:} # values supplied at runtime via env vars
   secret-key: ${LANGFUSE_SECRET_KEY:} # values supplied at runtime via env vars

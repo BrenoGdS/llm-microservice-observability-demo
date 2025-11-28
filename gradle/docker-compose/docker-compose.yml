@@ -150,9 +150,11 @@ services:
     volumes:
       - ./otel-collector-config.yaml:/etc/otelcol/config.yaml:ro
     environment:
-      LANGFUSE_PUBLIC_KEY: ${LANGFUSE_PUBLIC_KEY:-changeme-public} # CHANGEME
-      LANGFUSE_SECRET_KEY: ${LANGFUSE_SECRET_KEY:-changeme-secret} # CHANGEME
-      LANGFUSE_OTLP_ENDPOINT: ${LANGFUSE_OTLP_ENDPOINT:-http://langfuse-web:3000}
+      LANGFUSE_PUBLIC_KEY: ${LANGFUSE_PUBLIC_KEY:-pk-lf-23696d30-1880-459f-ab1c-de8647f9fa7e } # CHANGEME
+      LANGFUSE_SECRET_KEY: ${LANGFUSE_SECRET_KEY:-sk-lf-bc3bc8fb-d0ee-408b-86b1-b82bb477cc95} # CHANGEME
+      LANGFUSE_BASE_URL: ${LANGFUSE_BASE_URL:-http://langfuse-web:3000}
+      LANGFUSE_TRACES_URL: ${LANGFUSE_TRACES_URL:-http://langfuse-web:3000/api/public/ingestion}
+      LANGFUSE_BASIC_AUTH: ${LANGFUSE_BASIC_AUTH:-cGstbGYtMjM2OTZkMzAtMTg4MC00NTlmLWFiMWMtZGU4NjQ3ZjlmYTdlOnNrLWxmLWJjM2JjOGZiLWQwZWUtNDA4Yi04NmIxLWI4MmJiNDc3Y2M5NQ==}
     ports:
       - 4317:4317 # gRPC
       - 4318:4318 # HTTP (parafor Springboot application)
