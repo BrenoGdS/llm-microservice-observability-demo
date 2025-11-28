@@ -39,6 +39,10 @@ curl -X POST http://localhost:8080/api/chat \
 4. Exercise `/api/chat`, then inspect traces/generations inside the Langfuse UI to review prompts, completions, latency, and token usage emitted by `LangfuseChatModelListener`.
 5. Leave `langfuse.enabled=false` whenever Langfuse isn’t reachable to skip the extra HTTP calls.
 
+## Testing Steps
+
+6.2 Testing: With the OpenTelemetry collector running from Step 6.1, run Boot with the OTLP endpoint set, then check logs or Langfuse UI for traces.
+
 ## Roadmap (next up)
 1. Langfuse-based observability (ChatModelListener + OpenTelemetry).
 2. Conversation memory backed by Redis.

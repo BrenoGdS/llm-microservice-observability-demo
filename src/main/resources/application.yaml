@@ -16,6 +16,16 @@ logging:
   level:
     root: DEBUG
 
+management:
+  tracing:
+    sampling:
+      probability: 1.0
+  otlp:
+    tracing:
+      endpoint: ${OTEL_EXPORTER_OTLP_ENDPOINT:http://localhost:4318/v1/traces}
+      protocol: http/protobuf
+      compression: gzip
+
 langfuse:
   enabled: false # toggle to true when Langfuse is available
   base-url: http://localhost:3000 # point to your manually managed Langfuse instance
