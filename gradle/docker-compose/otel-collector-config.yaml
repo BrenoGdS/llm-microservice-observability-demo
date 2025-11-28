@@ -11,19 +11,14 @@ processors:
     timeout: 30s
 exporters:
   otlp/langfuse:
-    endpoint: "http://langfuse-web:3000" # Endpoint OTLP (Recomendado)
-
-    # Configuração da Fila (Correta)
+    endpoint: ${LANGFUSE_OTLP_ENDPOINT}
     sending_queue:
       enabled: true
-
-    # Configurações de Rede OTLP/HTTP (Corretas e no nível superior)
-    tls: # <-- A chave de configuração de TLS/inseguro deve vir aqui
-      insecure: true # ✅ Posição correta para desabilitar TLS
-
-    headers: # <-- Headers vão diretamente aqui
-      X-Langfuse-Public-Key: "pk-lf-a53b93e2-049d-48df-b993-6452807df915"
-      X-Langfuse-Secret-Key: "sk-lf-5adafa4e-b966-49c2-a1bc-1e5b4499f483"
+    tls:
+      insecure: true
+    headers:
+      X-Langfuse-Public-Key: ${LANGFUSE_PUBLIC_KEY}
+      X-Langfuse-Secret-Key: ${LANGFUSE_SECRET_KEY}
 
 service:
   pipelines:

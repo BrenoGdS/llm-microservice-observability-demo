@@ -141,14 +141,21 @@ services:
       timeout: 10s
       retries: 10
   otel-collector:
-    image: otel/opentelemetry-collector:nightly
-    container_name: otel-collector
-    command: [ "--config=/etc/otelcol/config.yaml" ]
+    image: otel/opentelemetry-collector:0.102.1
+    restart: unless-stopped
+    depends_on:
+      langfuse-web:
+        condition: service_started
+    command: ["--config=/etc/otelcol/config.yaml"]
     volumes:
-      - ./otel-collector-config.yaml:/etc/otelcol/config.yaml
+      - ./otel-collector-config.yaml:/etc/otelcol/config.yaml:ro
+    environment:
+      LANGFUSE_PUBLIC_KEY: ${LANGFUSE_PUBLIC_KEY:-changeme-public} # CHANGEME
+      LANGFUSE_SECRET_KEY: ${LANGFUSE_SECRET_KEY:-changeme-secret} # CHANGEME
+      LANGFUSE_OTLP_ENDPOINT: ${LANGFUSE_OTLP_ENDPOINT:-http://langfuse-web:3000}
     ports:
-      - "4317:4317" # Porta gRPC
-      - "4318:4318" # Porta HTTP (para o seu Spring Boot)
+      - 4317:4317 # gRPC
+      - 4318:4318 # HTTP (parafor Springboot application)
   postgres:
     image: docker.io/postgres:${POSTGRES_VERSION:-17}
     restart: always
