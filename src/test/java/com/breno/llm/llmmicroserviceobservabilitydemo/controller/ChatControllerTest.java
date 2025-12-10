@@ -1,9 +1,10 @@
-package com.breno.llm.llmmicroserviceobservabilitydemo.chat;
+package com.breno.llm.llmmicroserviceobservabilitydemo.controller;
 
-import com.breno.llm.llmmicroserviceobservabilitydemo.chat.dto.ChatRequest;
-import com.breno.llm.llmmicroserviceobservabilitydemo.chat.dto.ChatResponse;
-import com.breno.llm.llmmicroserviceobservabilitydemo.chat.dto.MessageDTO;
-import com.breno.llm.llmmicroserviceobservabilitydemo.chat.dto.MessageRole;
+import com.breno.llm.llmmicroserviceobservabilitydemo.dto.ChatRequest;
+import com.breno.llm.llmmicroserviceobservabilitydemo.dto.ChatResponse;
+import com.breno.llm.llmmicroserviceobservabilitydemo.dto.MessageDTO;
+import com.breno.llm.llmmicroserviceobservabilitydemo.dto.MessageRole;
+import com.breno.llm.llmmicroserviceobservabilitydemo.service.ChatService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

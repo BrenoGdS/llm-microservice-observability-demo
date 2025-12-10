@@ -1,4 +1,4 @@
-package com.breno.llm.llmmicroserviceobservabilitydemo.chat.dto;
+package com.breno.llm.llmmicroserviceobservabilitydemo.dto;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
