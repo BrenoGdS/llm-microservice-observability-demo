@@ -4,6 +4,8 @@ import com.breno.llm.llmmicroserviceobservabilitydemo.dto.ChatRequest;
 import com.breno.llm.llmmicroserviceobservabilitydemo.dto.ChatResponse;
 import com.breno.llm.llmmicroserviceobservabilitydemo.dto.MessageDTO;
 import com.breno.llm.llmmicroserviceobservabilitydemo.dto.MessageRole;
+import com.breno.llm.llmmicroserviceobservabilitydemo.dto.MemoryOptions;
+import com.breno.llm.llmmicroserviceobservabilitydemo.service.memory.ConversationMemoryService;
 import dev.langchain4j.data.message.AiMessage;
 import dev.langchain4j.data.message.ChatMessage;
 import dev.langchain4j.data.message.SystemMessage;
@@ -28,17 +30,20 @@ public class ChatService {
     private static final Logger log = LoggerFactory.getLogger(ChatService.class);
 
     private final ChatLanguageModel chatLanguageModel;
+    private final ConversationMemoryService conversationMemoryService;
 
-    public ChatService(ChatLanguageModel chatLanguageModel) {
+    public ChatService(ChatLanguageModel chatLanguageModel,
+                       ConversationMemoryService conversationMemoryService) {
         this.chatLanguageModel = chatLanguageModel;
+        this.conversationMemoryService = conversationMemoryService;
     }
 
     public ChatResponse chat(ChatRequest request) {
-        String conversationId = StringUtils.hasText(request.conversationId())
-                ? request.conversationId()
-                : UUID.randomUUID().toString();
+        boolean memoryRequested = isMemoryEnabled(request.memory());
+        String conversationId = determineConversationId(request.conversationId());
 
-        List<ChatMessage> messages = buildConversation(request);
+        List<MessageDTO> history = buildHistorySeed(request, memoryRequested, conversationId);
+        List<ChatMessage> messages = buildConversation(history, request.message());
 
         Instant start = Instant.now();
         Response<AiMessage> response = chatLanguageModel.generate(messages); // synchronous model invocation
@@ -54,17 +59,50 @@ public class ChatService {
         } else if (log.isDebugEnabled()) {
             log.debug("tokens unavailable latency={}ms", latency.toMillis());
         }
-        // TODO: emit latency/token events via ChatModelListener or OpenTelemetry. // placeholder for future instrumentation
+        // TODO: emit latency/token events via ChatModelListener or OpenTelemetry.
 
         String reply = response.content() != null ? response.content().text() : "";
+
+        if (memoryRequested) {
+            List<MessageDTO> updated = new ArrayList<>(history);
+            updated.add(new MessageDTO(MessageRole.USER, request.message()));
+            updated.add(new MessageDTO(MessageRole.ASSISTANT, reply));
+            conversationMemoryService.remember(conversationId, updated);
+        }
         return new ChatResponse(conversationId, reply);
     }
 
-    private List<ChatMessage> buildConversation(ChatRequest request) { // transforms DTO history into LangChain4j messages
-        List<ChatMessage> messages = new ArrayList<>();
+    private boolean isMemoryEnabled(MemoryOptions memoryOptions) {
+        return memoryOptions != null && memoryOptions.enabled();
+    }
 
+    private String determineConversationId(String candidate) {
+        if (StringUtils.hasText(candidate)) {
+            return candidate;
+        }
+        return UUID.randomUUID().toString();
+    }
+
+    private List<MessageDTO> buildHistorySeed(ChatRequest request, boolean memoryRequested, String conversationId) {
+        if (memoryRequested) {
+            return new ArrayList<>(conversationMemoryService.loadHistory(conversationId));
+        }
+        List<MessageDTO> history = new ArrayList<>();
         if (request.history() != null) {
             for (MessageDTO previous : request.history()) {
+                if (previous != null && StringUtils.hasText(previous.content())) {
+                    history.add(previous);
+                }
+            }
+        }
+        return history;
+    }
+
+    private List<ChatMessage> buildConversation(List<MessageDTO> history, String userMessage) { // transforms DTO history into LangChain4j messages
+        List<ChatMessage> messages = new ArrayList<>();
+
+        if (history != null) {
+            for (MessageDTO previous : history) {
                 if (previous == null || !StringUtils.hasText(previous.content())) {
                     continue;
                 }
@@ -72,7 +110,7 @@ public class ChatService {
             }
         }
 
-        messages.add(UserMessage.from(request.message()));
+        messages.add(UserMessage.from(userMessage));
         return messages;
     }
 

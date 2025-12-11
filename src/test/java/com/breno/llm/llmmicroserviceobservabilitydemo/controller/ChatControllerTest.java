@@ -39,7 +39,8 @@ class ChatControllerTest {
         ChatRequest request = new ChatRequest(
                 "conversation-123",
                 "Tell me about LangChain4j",
-                List.of(new MessageDTO(MessageRole.SYSTEM, "You are a helpful assistant."))
+                List.of(new MessageDTO(MessageRole.SYSTEM, "You are a helpful assistant.")),
+                null
         );
 
         ChatResponse response = new ChatResponse("conversation-123", "LangChain4j is a Java-first LLM framework.");
@@ -55,7 +56,7 @@ class ChatControllerTest {
 
     @Test
     void shouldReturnBadRequestWhenMessageMissing() throws Exception {
-        ChatRequest request = new ChatRequest("conversation-123", "", null);
+        ChatRequest request = new ChatRequest("conversation-123", "", null, null);
 
         mockMvc.perform(post("/api/chat")
                         .contentType(MediaType.APPLICATION_JSON)

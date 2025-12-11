@@ -1,6 +1,10 @@
 spring:
   application:
     name: llm-microservice-observability-demo
+  data:
+    redis:
+      host: localhost
+      port: 6379
 
 llm:
   provider: ollama
@@ -9,9 +13,16 @@ langchain4j:
   ollama:
     chat-model:
       base-url: http://localhost:11434
-      model-name: llama3.2
+      model-name: llama3
       temperature: 0.2
 
 logging:
   level:
     root: DEBUG
+
+chat:
+  memory:
+    enabled: true
+    window-size: 20
+    ttl: 30m
+    key-prefix: 'chat:history:'

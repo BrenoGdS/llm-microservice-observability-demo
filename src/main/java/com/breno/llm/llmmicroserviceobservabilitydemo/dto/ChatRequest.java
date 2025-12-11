@@ -11,7 +11,8 @@ import java.util.List;
 public record ChatRequest(
         String conversationId,
         @NotBlank String message,
-        List<@Valid MessageDTO> history
+        List<@Valid MessageDTO> history,
+        @Valid MemoryOptions memory
 ) {
 }
 
