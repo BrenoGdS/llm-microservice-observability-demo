@@ -78,6 +78,7 @@ curl --location 'http://localhost:8080/api/chat' \
 ## Conversation memory (Redis)
 
 - The app ships with `chat.memory.enabled=true`, but it only uses Redis for calls where the payload includes `"memory": { "enabled": true }`. Requests without that block behave exactly like before (stateless, using user-provided `history` if any).
+- The persona prompt lives in `chat.system-prompt`; by default it tells the LLM to act as a financing expert. Change or clear that property if you need a different tone.
 - Using Redis-backed memory:
   1. Start the Redis container (`docker-compose up -d redis`) and keep reusing the same `conversationId` across turns.
   2. Add `"memory": { "enabled": true }` to the JSON payload to load/persist turns automatically; the server will ignore client-provided `history` and rely on Redis.

@@ -21,6 +21,7 @@ logging:
     root: DEBUG
 
 chat:
+  system-prompt: "You are a financing expert who explains quotes in simple, friendly language."
   memory:
     enabled: true
     window-size: 20

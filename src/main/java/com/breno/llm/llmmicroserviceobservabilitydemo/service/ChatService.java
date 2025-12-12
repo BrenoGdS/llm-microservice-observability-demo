@@ -15,6 +15,7 @@ import dev.langchain4j.model.output.Response;
 import dev.langchain4j.model.output.TokenUsage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
@@ -31,11 +32,14 @@ public class ChatService {
 
     private final ChatLanguageModel chatLanguageModel;
     private final ConversationMemoryService conversationMemoryService;
+    private final String systemPrompt;
 
     public ChatService(ChatLanguageModel chatLanguageModel,
-                       ConversationMemoryService conversationMemoryService) {
+                       ConversationMemoryService conversationMemoryService,
+                       @Value("${chat.system-prompt:}") String systemPrompt) {
         this.chatLanguageModel = chatLanguageModel;
         this.conversationMemoryService = conversationMemoryService;
+        this.systemPrompt = systemPrompt;
     }
 
     public ChatResponse chat(ChatRequest request) {
@@ -100,6 +104,10 @@ public class ChatService {
 
     private List<ChatMessage> buildConversation(List<MessageDTO> history, String userMessage) { // transforms DTO history into LangChain4j messages
         List<ChatMessage> messages = new ArrayList<>();
+
+        if (StringUtils.hasText(systemPrompt)) {
+            messages.add(SystemMessage.from(systemPrompt));
+        }
 
         if (history != null) {
             for (MessageDTO previous : history) {

@@ -27,7 +27,7 @@ class ChatServiceTest {
 
     private final ChatLanguageModel chatLanguageModel = mock(ChatLanguageModel.class);
     private final ConversationMemoryService conversationMemoryService = mock(ConversationMemoryService.class);
-    private final ChatService chatService = new ChatService(chatLanguageModel, conversationMemoryService);
+    private final ChatService chatService = new ChatService(chatLanguageModel, conversationMemoryService, "");
 
     @Test // indicates test method
     void shouldSendHistoryAndReturnReply() {
